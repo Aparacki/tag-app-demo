@@ -24,9 +24,18 @@
     "noImplicitOverride": true,
     "noImplicitReturns": true,
     "noPropertyAccessFromIndexSignature": true,
-    "noUncheckedIndexedAccess": true
-
+    "noUncheckedIndexedAccess": true,
+    "rootDir": ".",
+    "baseUrl": ".",
+    "paths": {
+      "@styles": ["./src/styles"],
+      "@components/*": ["./src/components/*"],
+      "@api/*": ["./src/api/*"],
+      "@pages/*": ["./src/pages/*"],
+      "@src/*": ["./src/*"]
+    }
   },
   "include": ["src"],
+
   "references": [{ "path": "./tsconfig.node.json" }]
 }
