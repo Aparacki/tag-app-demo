@@ -6,12 +6,14 @@ import { TagsView } from "./pages/TagsView/TagsView"
 
 function App() {
   return (
+    <QueryClientProvider client={queryClient}>
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Box alignItems="center" display="flex" height="100vh" justifyContent="center" width="100%">
+        <ReactQueryDevtools initialIsOpen={false} />
         <TagsView />
       </Box>
     </ThemeProvider>
+    </QueryClientProvider>
   )
 }
 
