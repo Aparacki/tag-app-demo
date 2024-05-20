@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react"
+import { tagsQueryKeys } from "@api/tags/tagsQueryKeys"
+import { keepPreviousData, useQuery } from "@tanstack/react-query"
 
 export type Tag = {
   title: string
@@ -28,11 +29,11 @@ const tagsMock: Tag[] = [
   { id: 19, title: "GraphQL", occurrence: 6 },
   { id: 20, title: "REST", occurrence: 10 },
 ]
-const mockTagsApiCall = () =>
+const mockTagsApiCall = (filter?: string) =>
   new Promise<Tag[]>((response) => {
     setTimeout(() => {
-      response(tagsMock)
-    }, 1000)
+      response(tagsMock.filter((tag) => tag.title.toLowerCase().includes(filter?.toLowerCase() ?? "")))
+    }, 500)
   })
 
 const mockInitTagsApiCall = () =>
@@ -42,35 +43,17 @@ const mockInitTagsApiCall = () =>
     }, 2000)
   })
 
-export const useTagsQuery = () => {
-  const [tags, setTags] = useState<Tag[]>()
-  const [isLoading, setIsLoading] = useState(false)
-  const [isLoadingInitTags, setIsLoadingInitTags] = useState(false)
-  const [initTags, setInitTags] = useState<Tag[]>([])
-
-  useEffect(() => {
-    setIsLoading(true)
-    mockTagsApiCall()
-      .then((response) => {
-        setTags(response)
-        setIsLoading(false)
-      })
-      .catch(() => {
-        setIsLoading(false)
-      })
-  }, [])
-
-  useEffect(() => {
-    setIsLoadingInitTags(true)
-    mockInitTagsApiCall()
-      .then((response) => {
-        setInitTags(response)
-        setIsLoadingInitTags(false)
-      })
-      .catch(() => {
-        setIsLoadingInitTags(false)
-      })
-  }, [])
-
-  return { tags, initTags, isLoading, isLoadingInitTags }
+export const useTagsListOptionsQuery = (filters: { name?: string } = {}) => {
+  return useQuery({
+    queryFn: () => mockTagsApiCall(filters?.name),
+    queryKey: tagsQueryKeys.listOptions(JSON.stringify(filters)),
+    placeholderData: keepPreviousData,
+    staleTime: 60 * 1000,
+  })
+}
+export const useTagsListSelectedListQuery = () => {
+  return useQuery({
+    queryFn: mockInitTagsApiCall,
+    queryKey: tagsQueryKeys.listSelected(),
+  })
 }
