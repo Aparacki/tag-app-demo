@@ -1,0 +1,1 @@
+export { TagsRating } from "./TagsRating"
