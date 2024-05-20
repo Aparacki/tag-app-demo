@@ -7,6 +7,7 @@ import {
   Chip,
   CircularProgress,
   ClickAwayListener,
+  Divider,
   Grid,
   IconButton,
   ListItemText,
@@ -185,22 +186,29 @@ export const TagSelect: FC<TagSelectProps> = ({
           </Box>
         </Grid>
       )}
-      {!isLoadingInitValues && (
-        <Grid item xs={12}>
-          <Box display="flex" flexWrap="wrap">
-            {selectedValues.map((element) => (
-              <Box key={element.optionKey} p={0.5} width="fit-content">
-                <Chip
-                  label={element.label}
-                  variant="outlined"
-                  onDelete={() => {
-                    onDelete(element)
-                  }}
-                />
-              </Box>
-            ))}
-          </Box>
-        </Grid>
+      {!isLoadingInitValues && selectedValues.length > 0 && (
+        <>
+          <Grid item xs={12}>
+            <Box display="flex" flexWrap="wrap">
+              {selectedValues.map((element) => (
+                <Box key={element.optionKey} p={0.5} width="fit-content">
+                  <Chip
+                    label={element.label}
+                    variant="outlined"
+                    onDelete={() => {
+                      onDelete(element)
+                    }}
+                  />
+                </Box>
+              ))}
+            </Box>
+          </Grid>
+          {selectedValues.length > 0 && (
+            <Grid item xs={12}>
+              <Divider />
+            </Grid>
+          )}
+        </>
       )}
     </Grid>
   )
