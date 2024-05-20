@@ -16,36 +16,56 @@ import {
   Typography,
 } from "@mui/material"
 import { type FC, useEffect, useState } from "react"
+import { useDebouncedCallback } from "use-debounce"
 
 export type Option = {
   optionKey: number | string
   label: string
   extraText?: string
 }
-export interface Props {
-  isLoading: boolean
+export interface TagSelectProps {
+  isLoading?: boolean
+  isLoadingInitValues?: boolean
   options: Option[] | undefined
   initValues?: Option[]
-  onChange: (values: Option[]) => void
+  onChange?: (values: Option[]) => void
   onSubmit?: (values: Option[]) => void
+  onChangeInput?: (values: string) => void
+  disabledSubmit?: boolean
+  delay?: number
 }
 
-export const TagSelect: FC<Props> = ({ isLoading, options = [], initValues = [], onChange, onSubmit }) => {
+export const TagSelect: FC<TagSelectProps> = ({
+  isLoading,
+  options = [],
+  initValues = [],
+  onChange,
+  onSubmit,
+  onChangeInput,
+  disabledSubmit,
+  delay = 600,
+  isLoadingInitValues,
+}) => {
   const [selectedValues, setSelectedValues] = useState<Option[]>([])
   const [temporaryValues, setTemporaryValues] = useState<Option[]>([])
   const [show, setShow] = useState(false)
   const [inputValue, setInputValue] = useState("")
 
-  const initValuesDeps = JSON.stringify(initValues)
+  const isSubmitSave = temporaryValues.length === 0 || disabledSubmit
 
   const onClose = () => {
     setTemporaryValues(selectedValues)
     setShow(false)
   }
+  const onClear = () => {
+    handleChangeInput("")
+  }
+
   const onSave = () => {
     handleChangeValues(temporaryValues)
     onSubmit?.(temporaryValues)
-    onClose()
+    setShow(false)
+    onClear()
   }
 
   const onDelete = (tag: Option) => {
@@ -54,8 +74,11 @@ export const TagSelect: FC<Props> = ({ isLoading, options = [], initValues = [],
     onSubmit?.(values)
   }
 
-  const onClear = () => {
-    setInputValue("")
+  const debounceOnChangeInput = useDebouncedCallback((value: string) => onChangeInput?.(value), delay)
+
+  const handleChangeInput = (value: string) => {
+    setInputValue(value)
+    debounceOnChangeInput?.(value)
   }
 
   const handleChangeValues = (selectedOptions: Option[]) => {
@@ -64,6 +87,7 @@ export const TagSelect: FC<Props> = ({ isLoading, options = [], initValues = [],
     onChange?.(selectedOptions)
   }
 
+  const initValuesDeps = JSON.stringify(initValues)
   useEffect(() => {
     if (!initValues) return
     handleChangeValues(initValues)
@@ -82,7 +106,6 @@ export const TagSelect: FC<Props> = ({ isLoading, options = [], initValues = [],
             inputValue={inputValue}
             isOptionEqualToValue={(a, b) => a.optionKey === b.optionKey}
             limitTags={5}
-            loading={isLoading}
             open={show}
             options={options}
             renderTags={() => null}
@@ -98,7 +121,7 @@ export const TagSelect: FC<Props> = ({ isLoading, options = [], initValues = [],
               >
                 {children.children}
                 <Box p={1}>
-                  <Button fullWidth color="primary" disabled={isLoading} variant="contained" onClick={onSave}>
+                  <Button fullWidth color="primary" disabled={isSubmitSave} variant="contained" onClick={onSave}>
                     Zapisz
                   </Button>
                 </Box>
@@ -112,11 +135,16 @@ export const TagSelect: FC<Props> = ({ isLoading, options = [], initValues = [],
                 InputProps={{
                   ...parameters.InputProps,
                   startAdornment: <Search fontSize="small" />,
-                  endAdornment: inputValue?.length ? (
-                    <IconButton size="small" onClick={onClear}>
-                      <Close fontSize="small" />
-                    </IconButton>
-                  ) : null,
+                  endAdornment: (
+                    <>
+                      {isLoading ? <CircularProgress color="inherit" size={20} /> : null}
+                      {inputValue?.length ? (
+                        <IconButton size="small" onClick={onClear}>
+                          <Close fontSize="small" />
+                        </IconButton>
+                      ) : null}
+                    </>
+                  ),
                 }}
               />
             )}
@@ -142,7 +170,7 @@ export const TagSelect: FC<Props> = ({ isLoading, options = [], initValues = [],
             }}
             onInputChange={(_, v, reason) => {
               if (reason === "reset") return
-              setInputValue(v)
+              handleChangeInput(v)
             }}
             onOpen={() => {
               setShow(true)
@@ -150,14 +178,14 @@ export const TagSelect: FC<Props> = ({ isLoading, options = [], initValues = [],
           />
         </ClickAwayListener>
       </Grid>
-      {isLoading && (
+      {isLoadingInitValues && (
         <Grid item xs={12}>
           <Box alignItems="center" display="flex" width="100%">
             <CircularProgress size={16} sx={{ m: "auto" }} />
           </Box>
         </Grid>
       )}
-      {selectedValues.length > 0 && (
+      {!isLoadingInitValues && (
         <Grid item xs={12}>
           <Box display="flex" flexWrap="wrap">
             {selectedValues.map((element) => (
