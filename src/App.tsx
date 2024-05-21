@@ -1,3 +1,5 @@
+import "./reset.css"
+
 import { queryClient } from "@api/config"
 import { Layout } from "@components/Layout/Layout"
 import { Menu } from "@components/Menu/Menu"
