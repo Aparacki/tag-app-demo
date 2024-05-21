@@ -22,10 +22,10 @@ export const TagsView = () => {
   }
 
   return (
-    <Paper sx={{ width: "100%", maxWidth: 350, p: 2 }}>
+    <Paper elevation={0} sx={{ width: "100%", maxWidth: 350, p: 2 }}>
       <Grid container spacing={2}>
         <Grid item xs={12}>
-          <Typography variant="h4">Tagi</Typography>
+          <Typography variant="h5">Tagi</Typography>
         </Grid>
         <Grid item xs={12}>
           <TagSelect
@@ -38,6 +38,9 @@ export const TagsView = () => {
             onChangeInput={setFilters}
             onSubmit={onSubmit}
           />
+        </Grid>
+        <Grid item xs={12}>
+          <Divider />
         </Grid>
         <Grid item xs={12}>
           <TagsMenu />

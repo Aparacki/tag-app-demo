@@ -1,21 +1,7 @@
+import { TagChipList, TagOptionsList } from "@components/TagSelect/components"
+import { useAutocomplete } from "@mui/base/useAutocomplete"
 import { Close, Search } from "@mui/icons-material"
-import {
-  Autocomplete,
-  Box,
-  Button,
-  Checkbox,
-  Chip,
-  CircularProgress,
-  ClickAwayListener,
-  Divider,
-  Grid,
-  IconButton,
-  ListItemText,
-  MenuItem,
-  Paper,
-  TextField,
-  Typography,
-} from "@mui/material"
+import { Box, Button, CircularProgress, Grid, IconButton, TextField } from "@mui/material"
 import { type FC, useEffect, useState } from "react"
 import { useDebouncedCallback } from "use-debounce"
 
@@ -52,21 +38,19 @@ export const TagSelect: FC<TagSelectProps> = ({
   const [show, setShow] = useState(false)
   const [inputValue, setInputValue] = useState("")
 
-  const isSubmitSave = temporaryValues.length === 0 || disabledSubmit
+  const isSubmitDisabled = temporaryValues.length === 0 || disabledSubmit
 
   const onClose = () => {
     setTemporaryValues(selectedValues)
-    setShow(false)
-  }
-  const onClear = () => {
     handleChangeInput("")
+    setShow(false)
   }
 
   const onSave = () => {
     handleChangeValues(temporaryValues)
     onSubmit?.(temporaryValues)
+    handleChangeInput("")
     setShow(false)
-    onClear()
   }
 
   const onDelete = (tag: Option) => {
@@ -88,6 +72,35 @@ export const TagSelect: FC<TagSelectProps> = ({
     onChange?.(selectedOptions)
   }
 
+  const { getRootProps, getInputProps, getListboxProps, getOptionProps, groupedOptions, value } = useAutocomplete<
+    Option,
+    true,
+    true,
+    false
+  >({
+    multiple: true,
+    options,
+    getOptionLabel: (option) => option.label,
+    isOptionEqualToValue: (a, b) => a.optionKey === b.optionKey,
+    inputValue,
+    value: temporaryValues,
+    onChange: (_, newValue) => {
+      setTemporaryValues(newValue)
+    },
+    onInputChange: (_, newInputValue, reason) => {
+      if (reason !== "reset") handleChangeInput(newInputValue)
+    },
+    open: show,
+    onClose: (_, reason) => {
+      if (reason !== "escape" && reason !== "toggleInput") return
+      onClose()
+    },
+    onOpen: () => {
+      setShow(true)
+    },
+    filterOptions: (option) => option,
+  })
+
   const initValuesDeps = JSON.stringify(initValues)
   useEffect(() => {
     if (!initValues) return
@@ -98,87 +111,40 @@ export const TagSelect: FC<TagSelectProps> = ({
   return (
     <Grid container item spacing={2} xs={12}>
       <Grid item xs={12}>
-        <ClickAwayListener onClickAway={onClose}>
-          <Autocomplete<Option, true, true>
-            disableClearable
-            multiple
-            forcePopupIcon={false}
-            getOptionLabel={(option) => option.label}
-            inputValue={inputValue}
-            isOptionEqualToValue={(a, b) => a.optionKey === b.optionKey}
-            limitTags={5}
-            open={show}
-            options={options}
-            renderTags={() => null}
-            size="small"
-            value={temporaryValues}
-            PaperComponent={(children, ...props) => (
-              <Paper
-                {...props}
-                className={children.className}
-                onClick={(e) => {
-                  e.stopPropagation()
-                }}
-              >
-                {children.children}
-                <Box p={1}>
-                  <Button fullWidth color="primary" disabled={isSubmitSave} variant="contained" onClick={onSave}>
-                    Zapisz
-                  </Button>
-                </Box>
-              </Paper>
-            )}
-            renderInput={(parameters) => (
-              <TextField
-                {...parameters}
-                label="Wyszukaj grupę lub tag"
-                variant="standard"
-                InputProps={{
-                  ...parameters.InputProps,
-                  startAdornment: <Search fontSize="small" />,
-                  endAdornment: (
-                    <>
-                      {isLoading ? <CircularProgress color="inherit" size={20} /> : null}
-                      {inputValue?.length ? (
-                        <IconButton size="small" onClick={onClear}>
-                          <Close fontSize="small" />
-                        </IconButton>
-                      ) : null}
-                    </>
-                  ),
-                }}
-              />
-            )}
-            renderOption={(props, tag, { selected }) => (
-              <MenuItem {...props} key={tag.optionKey} sx={{ padding: 0 }}>
-                <ListItemText>
-                  <Checkbox checked={selected} size="small" sx={{ padding: 0.5 }} />
-                  {tag.label}
-                </ListItemText>
-                {!!tag.extraText && (
-                  <Typography color="text.secondary" variant="body2">
-                    {tag.extraText}
-                  </Typography>
-                )}
-              </MenuItem>
-            )}
-            onChange={(_, v) => {
-              setTemporaryValues(v)
-            }}
-            onClose={(_, reason) => {
-              if (reason !== "escape" && reason !== "toggleInput") return
-              setShow(false)
-            }}
-            onInputChange={(_, v, reason) => {
-              if (reason === "reset") return
-              handleChangeInput(v)
-            }}
-            onOpen={() => {
-              setShow(true)
+        <div {...getRootProps()}>
+          <TextField
+            fullWidth
+            inputProps={getInputProps()}
+            placeholder="Wyszukaj grupę lub tag"
+            variant="standard"
+            InputProps={{
+              startAdornment: <Search fontSize="small" />,
+              endAdornment: (
+                <>
+                  {isLoading ? <CircularProgress color="inherit" size={20} /> : null}
+                  {show && (
+                    <IconButton size="small" onClick={onClose}>
+                      <Close fontSize="small" />
+                    </IconButton>
+                  )}
+                </>
+              ),
             }}
           />
-        </ClickAwayListener>
+        </div>
       </Grid>
+      {show && (
+        <Grid item xs={12}>
+          <ul {...getListboxProps()}>
+            <TagOptionsList getOptionProps={getOptionProps} groupedOptions={groupedOptions} value={value} />
+            <Box p={1}>
+              <Button fullWidth color="primary" disabled={isSubmitDisabled} variant="contained" onClick={onSave}>
+                Zapisz
+              </Button>
+            </Box>
+          </ul>
+        </Grid>
+      )}
       {isLoadingInitValues && (
         <Grid item xs={12}>
           <Box alignItems="center" display="flex" width="100%">
@@ -186,29 +152,10 @@ export const TagSelect: FC<TagSelectProps> = ({
           </Box>
         </Grid>
       )}
-      {!isLoadingInitValues && selectedValues.length > 0 && (
-        <>
-          <Grid item xs={12}>
-            <Box display="flex" flexWrap="wrap">
-              {selectedValues.map((element) => (
-                <Box key={element.optionKey} p={0.5} width="fit-content">
-                  <Chip
-                    label={element.label}
-                    variant="outlined"
-                    onDelete={() => {
-                      onDelete(element)
-                    }}
-                  />
-                </Box>
-              ))}
-            </Box>
-          </Grid>
-          {selectedValues.length > 0 && (
-            <Grid item xs={12}>
-              <Divider />
-            </Grid>
-          )}
-        </>
+      {!show && !isLoadingInitValues && (
+        <Grid item xs={12}>
+          <TagChipList selectedValues={selectedValues} onDelete={onDelete} />
+        </Grid>
       )}
     </Grid>
   )

@@ -14,6 +14,19 @@ export const theme = createTheme({
     fontFamily: ["Roboto", "sans-serif"].join(","),
   },
   components: {
+    MuiCssBaseline: {
+      styleOverrides: {
+        body: {
+          "*": {
+            "scrollbar-width": "thin",
+          },
+          "*::-webkit-scrollbar": {
+            width: "4px",
+            height: "4px",
+          },
+        },
+      },
+    },
     MuiAlert: {
       styleOverrides: {
         root: ({ ownerState }) => ({

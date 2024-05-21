@@ -49,6 +49,7 @@ export const useTagsListOptionsQuery = (filters: { name?: string } = {}) => {
     queryKey: tagsQueryKeys.listOptions(JSON.stringify(filters)),
     placeholderData: keepPreviousData,
     staleTime: 60 * 1000,
+    select: (options) => options.sort((a, b) => (a.occurrence < b.occurrence ? 1 : -1)),
   })
 }
 export const useTagsListSelectedListQuery = () => {
