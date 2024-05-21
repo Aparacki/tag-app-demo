@@ -1,30 +1,35 @@
-# React + TypeScript + Vite
+# Tag App Demo
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+The Tag App Demo project is a simple React application for selecting tags.
 
-Currently, two official plugins are available:
+## Getting Started
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+1. **Install Dependencies**: Run `yarn install` in the project root directory to install all required dependencies.
 
-## Expanding the ESLint configuration
+2. **Running the Project**: To run the project locally, use one of the following commands:
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+   - `yarn dev`: Starts the application in development mode.
+   - `yarn build`: Builds the application for production.
+   - `yarn preview`: Previews the built application in production mode.
 
-- Configure the top-level `parserOptions` property like this:
+3. **Testing**: To run tests, use the command `yarn test`.
 
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
+## Technologies Used
+
+- React
+- TypeScript
+- Vite
+- Material-UI
+- React Query
+
+## Running Tests
+
+Tests in the project are written using the `@testing-library/react` library and executed using Vitest. To run tests, execute the following command:
+
+```sh
+yarn test
 ```
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+## License
+
+This project is licensed under the [MIT License](LICENSE).
