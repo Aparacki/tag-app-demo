@@ -31,7 +31,7 @@
       "@styles": ["./src/styles"],
       "@components/*": ["./src/components/*"],
       "@api/*": ["./src/api/*"],
-      "@pages/*": ["src/views/*"],
+      "@views/*": ["src/views/*"],
       "@src/*": ["./src/*"]
     }
   },

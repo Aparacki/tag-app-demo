@@ -1,11 +1,11 @@
 import { queryClient } from "@api/config"
-import { Box, ThemeProvider } from "@mui/material"
+import { Layout } from "@components/Layout/Layout"
+import { Menu } from "@components/Menu/Menu"
+import { ThemeProvider } from "@mui/material"
 import CssBaseline from "@mui/material/CssBaseline"
 import { theme } from "@styles"
 import { QueryClientProvider } from "@tanstack/react-query"
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
-
-import { TagsView } from "./views/TagsView/TagsView"
 
 function App() {
   return (
@@ -13,9 +13,9 @@ function App() {
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <ReactQueryDevtools initialIsOpen={false} />
-        <Box display="flex" height="100vh" justifyContent="center" width="100%">
-          <TagsView />
-        </Box>
+        <Layout>
+          <Menu />
+        </Layout>
       </ThemeProvider>
     </QueryClientProvider>
   )

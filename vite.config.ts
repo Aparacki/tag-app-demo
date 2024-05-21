@@ -7,6 +7,7 @@ export default defineConfig({
     alias: {
       "@styles": "/src/styles",
       "@components": "/src/components",
+      "@views": "/src/views",
       "@api": "/src/api",
       "@/*": "/src/*",
     },
