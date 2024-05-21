@@ -10,7 +10,7 @@ const MenuElement = ({ text, Icon, disabled }: { text: string; Icon: ReactNode; 
 )
 
 export const TagsMenu = () => (
-  <MenuList>
+  <MenuList disablePadding>
     <MenuElement disabled Icon={<AutoAwesomeOutlined fontSize="small" />} text="CMS AI" />
     <MenuElement Icon={<AutoAwesome fontSize="small" />} text="Analizuj tekst" />
     <MenuElement Icon={<LocalOfferOutlined fontSize="small" />} text="Najpopularniejsze tagi" />

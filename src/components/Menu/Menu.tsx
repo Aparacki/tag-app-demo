@@ -37,10 +37,11 @@ export const Menu = () => {
       </Paper>
       <Popover
         anchorEl={anchorElement}
+        elevation={3}
         open={open && view === "tags"}
         anchorOrigin={{
-          vertical: "center",
-          horizontal: "right",
+          vertical: "top",
+          horizontal: 50,
         }}
         onClose={handleClose}
       >
