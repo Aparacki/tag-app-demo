@@ -30,17 +30,17 @@ const tagsMock: Tag[] = [
   { id: 20, title: "REST", occurrence: 10 },
 ]
 const mockTagsApiCall = (filter?: string) =>
-  new Promise<Tag[]>((response) => {
+  new Promise<Tag[]>((response, rej) => {
     setTimeout(() => {
       response(tagsMock.filter((tag) => tag.title.toLowerCase().includes(filter?.toLowerCase() ?? "")))
-    }, 500)
+    }, 200)
   })
 
 const mockInitTagsApiCall = () =>
-  new Promise<Tag[]>((response) => {
+  new Promise<Tag[]>((response, rej) => {
     setTimeout(() => {
       response(tagsMock.slice(0, 5))
-    }, 2000)
+    }, 500)
   })
 
 export const useTagsListOptionsQuery = (filters: { name?: string } = {}) => {

@@ -29,10 +29,18 @@ export const tagsMock = [
 
 export const optionsMock = mapTagToOption(tagsMock)
 
+const buttons = {
+  newProps: "new props button",
+  initError: "set init error button",
+  optionsError: "set options error button",
+}
+
 export const setup = {
-  changeInitialValuesHandler: () => fireEvent.click(screen.getByText("new props button")),
+  changeStateHandler: (action: keyof typeof buttons) => fireEvent.click(screen.getByText(buttons[action])),
   Component: () => {
     const [values, setValues] = useState(optionsMock)
+    const [isInitValuesError, setIsInitValuesError] = useState(false)
+    const [isOptionsError, setIsOptionsError] = useState(false)
     return (
       <>
         <button
@@ -40,9 +48,28 @@ export const setup = {
             setValues(optionsMock.slice(0, 1))
           }}
         >
-          new props button
+          {buttons.newProps}
         </button>
-        <TagSelect initValues={values} options={optionsMock} />
+        <button
+          onClick={() => {
+            setIsInitValuesError(true)
+          }}
+        >
+          {buttons.initError}
+        </button>
+        <button
+          onClick={() => {
+            setIsOptionsError(true)
+          }}
+        >
+          {buttons.optionsError}
+        </button>
+        <TagSelect
+          initValues={values}
+          isError={isOptionsError}
+          isErrorInitValues={isInitValuesError}
+          options={optionsMock}
+        />
       </>
     )
   },

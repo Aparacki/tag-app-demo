@@ -31,6 +31,8 @@ export const TagsView = () => {
           <TagSelect
             disabledSubmit={selectedTags.isLoading}
             initValues={mapTagToOption(selectedTags.data)}
+            isError={selectedTags.isError || tagsList.isError}
+            isErrorInitValues={selectedTags.isError}
             isLoading={tagsList.isFetching}
             isLoadingInitValues={selectedTags.isLoading}
             options={mapTagToOption(tagsList.data)}

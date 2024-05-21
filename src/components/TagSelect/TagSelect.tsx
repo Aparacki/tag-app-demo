@@ -1,7 +1,7 @@
-import { TagChipList, TagOptionsList } from "@components/TagSelect/components"
+import { TagChipList, TagErrorAlert, TagOptionsList } from "@components/TagSelect/components"
 import { useAutocomplete } from "@mui/base/useAutocomplete"
 import { Close, Search } from "@mui/icons-material"
-import { Box, Button, CircularProgress, Grid, IconButton, TextField } from "@mui/material"
+import { Box, Button, CircularProgress, Grid, IconButton, List, TextField } from "@mui/material"
 import { type FC, useEffect, useState } from "react"
 import { useDebouncedCallback } from "use-debounce"
 
@@ -11,34 +11,38 @@ export type Option = {
   extraText?: string
 }
 export interface TagSelectProps {
+  delay?: number
+  disabledSubmit?: boolean
+  initValues?: Option[]
+  isError?: boolean
+  isErrorInitValues?: boolean
   isLoading?: boolean
   isLoadingInitValues?: boolean
-  options: Option[] | undefined
-  initValues?: Option[]
   onChange?: (values: Option[]) => void
-  onSubmit?: (values: Option[]) => void
   onChangeInput?: (values: string) => void
-  disabledSubmit?: boolean
-  delay?: number
+  onSubmit?: (values: Option[]) => void
+  options: Option[] | undefined
 }
 
 export const TagSelect: FC<TagSelectProps> = ({
-  isLoading,
-  options = [],
-  initValues = [],
-  onChange,
-  onSubmit,
-  onChangeInput,
-  disabledSubmit,
   delay = 600,
+  disabledSubmit,
+  initValues = [],
+  isError,
+  isErrorInitValues,
+  isLoading,
   isLoadingInitValues,
+  onChange,
+  onChangeInput,
+  onSubmit,
+  options = [],
 }) => {
   const [selectedValues, setSelectedValues] = useState<Option[]>([])
   const [temporaryValues, setTemporaryValues] = useState<Option[]>([])
   const [show, setShow] = useState(false)
   const [inputValue, setInputValue] = useState("")
 
-  const isSubmitDisabled = temporaryValues.length === 0 || disabledSubmit
+  const isSubmitDisabled = disabledSubmit || isError || isErrorInitValues
 
   const onClose = () => {
     setTemporaryValues(selectedValues)
@@ -92,7 +96,7 @@ export const TagSelect: FC<TagSelectProps> = ({
     },
     open: show,
     onClose: (_, reason) => {
-      if (reason !== "escape" && reason !== "toggleInput") return
+      if (reason !== "escape") return
       onClose()
     },
     onOpen: () => {
@@ -121,7 +125,11 @@ export const TagSelect: FC<TagSelectProps> = ({
               startAdornment: <Search fontSize="small" />,
               endAdornment: (
                 <>
-                  {isLoading ? <CircularProgress color="inherit" size={20} /> : null}
+                  {isLoading && (
+                    <Box>
+                      <CircularProgress color="inherit" size={16} />
+                    </Box>
+                  )}
                   {show && (
                     <IconButton size="small" onClick={onClose}>
                       <Close fontSize="small" />
@@ -135,27 +143,35 @@ export const TagSelect: FC<TagSelectProps> = ({
       </Grid>
       {show && (
         <Grid item xs={12}>
-          <ul {...getListboxProps()} data-testid="tag-select-options-list">
-            <TagOptionsList getOptionProps={getOptionProps} groupedOptions={groupedOptions} value={value} />
+          <List {...getListboxProps()} disablePadding data-testid="tag-select-options-list">
+            {isError ? (
+              <TagErrorAlert />
+            ) : (
+              <TagOptionsList getOptionProps={getOptionProps} groupedOptions={groupedOptions} value={value} />
+            )}
             <Box p={1}>
               <Button fullWidth color="primary" disabled={isSubmitDisabled} variant="contained" onClick={onSave}>
                 Zapisz
               </Button>
             </Box>
-          </ul>
+          </List>
         </Grid>
       )}
-      {isLoadingInitValues && (
-        <Grid item xs={12}>
-          <Box alignItems="center" display="flex" width="100%">
-            <CircularProgress size={16} sx={{ m: "auto" }} />
-          </Box>
-        </Grid>
-      )}
-      {!show && !isLoadingInitValues && (
-        <Grid item xs={12}>
-          <TagChipList selectedValues={selectedValues} onDelete={onDelete} />
-        </Grid>
+      {!show && (
+        <>
+          {isLoadingInitValues && (
+            <Grid item xs={12}>
+              <Box alignItems="center" display="flex" width="100%">
+                <CircularProgress size={16} sx={{ m: "auto" }} />
+              </Box>
+            </Grid>
+          )}
+          {!isLoadingInitValues && (
+            <Grid item xs={12}>
+              <TagChipList isError={isErrorInitValues} selectedValues={selectedValues} onDelete={onDelete} />
+            </Grid>
+          )}
+        </>
       )}
     </Grid>
   )
