@@ -1,8 +1,8 @@
 import type { Option } from "@components/TagSelect"
 import type { Tag } from "@src/api/tags/useTagsQuery"
 
-export const mapTagToOption = (tags: Tag[] | undefined): Option[] | undefined =>
-  tags?.map((tag) => ({
+export const mapTagToOption = (tags: Tag[] | undefined): Option[] =>
+  (tags ?? [])?.map((tag) => ({
     optionKey: tag.id,
     label: tag.title,
     extraText: `+${tag.occurrence}`,

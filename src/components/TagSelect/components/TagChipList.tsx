@@ -8,7 +8,7 @@ export const TagChipList = ({
   selectedValues: Option[]
   onDelete: (value: Option) => void
 }) => (
-  <Box display="flex" flexWrap="wrap">
+  <Box data-testid="tag-select-chips-list" display="flex" flexWrap="wrap">
     {selectedValues?.length ? (
       selectedValues.map((element) => (
         <Box key={element.optionKey} p={0.5} width="fit-content">

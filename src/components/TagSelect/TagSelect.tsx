@@ -135,7 +135,7 @@ export const TagSelect: FC<TagSelectProps> = ({
       </Grid>
       {show && (
         <Grid item xs={12}>
-          <ul {...getListboxProps()}>
+          <ul {...getListboxProps()} data-testid="tag-select-options-list">
             <TagOptionsList getOptionProps={getOptionProps} groupedOptions={groupedOptions} value={value} />
             <Box p={1}>
               <Button fullWidth color="primary" disabled={isSubmitDisabled} variant="contained" onClick={onSave}>

@@ -79,6 +79,7 @@ module.exports = {
     "unicorn/no-array-reduce": "error",
     "unicorn/no-console-spaces": "error",
     "unicorn/no-null": "off",
+    "unicorn/consistent-function-scoping": "warn",
     "unicorn/filename-case": [
       "error",
       {
