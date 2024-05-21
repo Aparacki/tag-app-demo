@@ -1,21 +1,21 @@
 import { useTagsListOptionsQuery, useTagsListSelectedListQuery } from "@api/tags/useTagsQuery"
 import type { TagSelectProps } from "@components/TagSelect/TagSelect"
 import { TagSelect } from "@components/TagSelect/TagSelect"
-import { Divider, Grid, Paper, Typography } from "@mui/material"
+import { Close } from "@mui/icons-material"
+import { Divider, Grid, IconButton, Paper, Typography } from "@mui/material"
 import { useState } from "react"
 
 import { TagsMenu, TagsRating } from "./components"
 import { mapTagToOption } from "./utils"
 
-export const TagsView = () => {
+export const TagsView = ({ onClose }: { onClose: () => void }) => {
   const [filters, setFilters] = useState("")
   const tagsList = useTagsListOptionsQuery({ name: filters })
   const selectedTags = useTagsListSelectedListQuery()
   const [ratingValue, setRatingValue] = useState(0)
 
-  const onSubmit: TagSelectProps["onSubmit"] = (options) => {
+  const onSubmit: TagSelectProps["onSubmit"] = (_) => {
     // save API handler
-    console.log("onSubmit", options)
   }
   const onChange: TagSelectProps["onChange"] = (options) => {
     setRatingValue(options.length)
@@ -24,8 +24,13 @@ export const TagsView = () => {
   return (
     <Paper elevation={0} sx={{ width: "100%", maxWidth: 350, p: 2 }}>
       <Grid container spacing={2}>
-        <Grid item xs={12}>
+        <Grid item xs>
           <Typography variant="h5">Tagi</Typography>
+        </Grid>
+        <Grid item>
+          <IconButton sx={{ ml: "auto" }} onClick={onClose}>
+            <Close />
+          </IconButton>
         </Grid>
         <Grid item xs={12}>
           <TagSelect

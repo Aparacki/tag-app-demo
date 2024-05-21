@@ -43,9 +43,9 @@ export const Menu = () => {
           vertical: "top",
           horizontal: 50,
         }}
-        onClose={handleClose}
+        onClose={() => {}}
       >
-        <TagsView />
+        <TagsView onClose={handleClose} />
       </Popover>
     </>
   )
