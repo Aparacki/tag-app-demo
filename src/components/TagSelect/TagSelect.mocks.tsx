@@ -64,12 +64,7 @@ export const setup = {
         >
           {buttons.optionsError}
         </button>
-        <TagSelect
-          initValues={values}
-          isError={isOptionsError}
-          isErrorInitValues={isInitValuesError}
-          options={optionsMock}
-        />
+        <TagSelect data={values} isError={isInitValuesError || isOptionsError} options={optionsMock} />
       </>
     )
   },

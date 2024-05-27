@@ -1,9 +1,12 @@
-import { TagChipList, TagErrorAlert, TagOptionsList } from "@components/TagSelect/components"
+import { Loader } from "@components/common/Loader"
+import { TagChipList, TagOptionsList } from "@components/TagSelect/components"
 import { useAutocomplete } from "@mui/base/useAutocomplete"
 import { Close, Search } from "@mui/icons-material"
 import { Box, Button, CircularProgress, Grid, IconButton, List, TextField } from "@mui/material"
-import { type FC, useEffect, useState } from "react"
+import { type FC, useState } from "react"
 import { useDebouncedCallback } from "use-debounce"
+
+const DELAY = 600
 
 export type Option = {
   optionKey: number | string
@@ -11,69 +14,54 @@ export type Option = {
   extraText?: string
 }
 export interface TagSelectProps {
-  delay?: number
   disabledSubmit?: boolean
-  initValues?: Option[]
+  data?: Option[]
   isError?: boolean
-  isErrorInitValues?: boolean
   isLoading?: boolean
-  isLoadingInitValues?: boolean
-  onChange?: (values: Option[]) => void
-  onChangeInput?: (values: string) => void
-  onSubmit?: (values: Option[]) => void
+  isLoadingData?: boolean
+  onChangeInput?: (value: string) => void
+  onSubmit?: (value: Option[]) => void
   options: Option[] | undefined
 }
 
 export const TagSelect: FC<TagSelectProps> = ({
-  delay = 600,
   disabledSubmit,
-  initValues = [],
+  data = [],
   isError,
-  isErrorInitValues,
-  isLoading,
-  isLoadingInitValues,
-  onChange,
+  isLoading: isLoadingOptions,
+  isLoadingData,
   onChangeInput,
   onSubmit,
   options = [],
 }) => {
-  const [selectedValues, setSelectedValues] = useState<Option[]>([])
-  const [temporaryValues, setTemporaryValues] = useState<Option[]>([])
+  const [temporaryValues, setTemporaryValues] = useState<Option[]>(data)
   const [show, setShow] = useState(false)
   const [inputValue, setInputValue] = useState("")
 
-  const isSubmitDisabled = disabledSubmit || isError || isErrorInitValues
+  const isSubmitDisabled = disabledSubmit || isError
 
   const onClose = () => {
-    setTemporaryValues(selectedValues)
+    setTemporaryValues(data)
     handleChangeInput("")
     setShow(false)
   }
 
   const onSave = () => {
-    handleChangeValues(temporaryValues)
     onSubmit?.(temporaryValues)
     handleChangeInput("")
     setShow(false)
   }
 
   const onDelete = (tag: Option) => {
-    const values = selectedValues.filter((element) => element.optionKey !== tag.optionKey)
-    handleChangeValues(values)
-    onSubmit?.(values)
+    const filteredValue = data.filter((element) => element.optionKey !== tag.optionKey)
+    onSubmit?.(filteredValue)
   }
 
-  const debounceOnChangeInput = useDebouncedCallback((value: string) => onChangeInput?.(value), delay)
+  const debounceOnChangeInput = useDebouncedCallback((value: string) => onChangeInput?.(value), DELAY)
 
   const handleChangeInput = (value: string) => {
     setInputValue(value)
     debounceOnChangeInput?.(value)
-  }
-
-  const handleChangeValues = (selectedOptions: Option[]) => {
-    setSelectedValues(selectedOptions)
-    setTemporaryValues(selectedOptions)
-    onChange?.(selectedOptions)
   }
 
   const { getRootProps, getInputProps, getListboxProps, getOptionProps, groupedOptions, value } = useAutocomplete<
@@ -100,17 +88,11 @@ export const TagSelect: FC<TagSelectProps> = ({
       onClose()
     },
     onOpen: () => {
+      setTemporaryValues(data)
       setShow(true)
     },
     filterOptions: (option) => option,
   })
-
-  const initValuesDeps = JSON.stringify(initValues)
-  useEffect(() => {
-    if (!initValues) return
-    handleChangeValues(initValues)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initValuesDeps])
 
   return (
     <Grid container item spacing={2} xs={12}>
@@ -125,7 +107,7 @@ export const TagSelect: FC<TagSelectProps> = ({
               startAdornment: <Search fontSize="small" />,
               endAdornment: (
                 <>
-                  {isLoading && (
+                  {isLoadingOptions && (
                     <Box>
                       <CircularProgress color="inherit" size={16} />
                     </Box>
@@ -144,11 +126,7 @@ export const TagSelect: FC<TagSelectProps> = ({
       {show && (
         <Grid item xs={12}>
           <List {...getListboxProps()} disablePadding data-testid="tag-select-options-list">
-            {isError ? (
-              <TagErrorAlert />
-            ) : (
-              <TagOptionsList getOptionProps={getOptionProps} groupedOptions={groupedOptions} value={value} />
-            )}
+            <TagOptionsList getOptionProps={getOptionProps} groupedOptions={groupedOptions} value={value} />
             <Box p={1}>
               <Button fullWidth color="primary" disabled={isSubmitDisabled} variant="contained" onClick={onSave}>
                 Zapisz
@@ -158,20 +136,12 @@ export const TagSelect: FC<TagSelectProps> = ({
         </Grid>
       )}
       {!show && (
-        <>
-          {isLoadingInitValues && (
-            <Grid item xs={12}>
-              <Box alignItems="center" display="flex" width="100%">
-                <CircularProgress size={16} sx={{ m: "auto" }} />
-              </Box>
-            </Grid>
-          )}
-          {!isLoadingInitValues && (
-            <Grid item xs={12}>
-              <TagChipList isError={isErrorInitValues} selectedValues={selectedValues} onDelete={onDelete} />
-            </Grid>
-          )}
-        </>
+        <Grid item xs={12}>
+          <Box position="relative">
+            <Loader isLoading={isLoadingData} />
+            <TagChipList data={data} isError={isError} onDelete={onDelete} />
+          </Box>
+        </Grid>
       )}
     </Grid>
   )

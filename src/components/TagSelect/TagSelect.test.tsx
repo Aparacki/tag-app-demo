@@ -16,7 +16,7 @@ describe("TagSelect Component Tests", () => {
   const saveButton = () => screen.getByText("zapisz", { exact: false })
 
   it("should render initial tags correctly", () => {
-    render(<TagSelect initValues={optionsMock} options={[]} />)
+    render(<TagSelect data={optionsMock} options={[]} />)
 
     const chip1 = screen.getByText("JavaScript")
     const chip2 = screen.getByText("Angular")
@@ -33,9 +33,7 @@ describe("TagSelect Component Tests", () => {
     const onSubmit = vi.fn()
     const onChangeInput = vi.fn()
 
-    render(
-      <TagSelect initValues={optionsMock} options={optionsMock} onChangeInput={onChangeInput} onSubmit={onSubmit} />
-    )
+    render(<TagSelect data={optionsMock} options={optionsMock} onChangeInput={onChangeInput} onSubmit={onSubmit} />)
 
     fireEvent.click(searchInput())
     await userEvent.type(searchInput(), "jav")
@@ -75,7 +73,7 @@ describe("TagSelect Component Tests", () => {
   it("should remove tags correctly", () => {
     const onSubmit = vi.fn()
 
-    render(<TagSelect initValues={optionsMock.slice(0, 2)} options={optionsMock} onSubmit={onSubmit} />)
+    render(<TagSelect data={optionsMock.slice(0, 2)} options={optionsMock} onSubmit={onSubmit} />)
 
     const removeButtons = () => within(screen.getByTestId("tag-select-chips-list")).queryAllByTestId("CancelIcon")
     removeButtons().map((element) => fireEvent.click(element))

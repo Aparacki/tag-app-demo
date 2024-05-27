@@ -1,5 +1,5 @@
 import { tagsQueryKeys } from "@api/tags/tagsQueryKeys"
-import { keepPreviousData, useQuery } from "@tanstack/react-query"
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 
 export type Tag = {
   title: string
@@ -29,23 +29,33 @@ const tagsMock: Tag[] = [
   { id: 19, title: "GraphQL", occurrence: 6 },
   { id: 20, title: "REST", occurrence: 10 },
 ]
-const mockTagsApiCall = (filter?: string) =>
+
+let tagsData = tagsMock.slice(0, 5)
+
+const mockPatchTagsApiCall = (tags: Tag[]) =>
+  new Promise<Tag[]>((response) => {
+    setTimeout(() => {
+      tagsData = tags
+      response(tags)
+    }, 300)
+  })
+const mockTagOptionsApiCall = (filter?: string) =>
   new Promise<Tag[]>((response) => {
     setTimeout(() => {
       response(tagsMock.filter((tag) => tag.title.toLowerCase().includes(filter?.toLowerCase() ?? "")))
-    }, 200)
+    }, 300)
   })
 
-const mockInitTagsApiCall = () =>
+const mockSelectedTagsApiCall = () =>
   new Promise<Tag[]>((response) => {
     setTimeout(() => {
-      response(tagsMock.slice(0, 5))
+      response(tagsData)
     }, 500)
   })
 
-export const useTagsListOptionsQuery = (filters: { name?: string } = {}) => {
+export const useTagOptionsQuery = (filters: { name?: string } = {}) => {
   return useQuery({
-    queryFn: () => mockTagsApiCall(filters?.name),
+    queryFn: () => mockTagOptionsApiCall(filters?.name),
     queryKey: tagsQueryKeys.listOptions(JSON.stringify(filters)),
     placeholderData: keepPreviousData,
     staleTime: 60 * 1000,
@@ -54,7 +64,21 @@ export const useTagsListOptionsQuery = (filters: { name?: string } = {}) => {
 }
 export const useTagsListSelectedListQuery = () => {
   return useQuery({
-    queryFn: mockInitTagsApiCall,
+    queryFn: mockSelectedTagsApiCall,
     queryKey: tagsQueryKeys.listSelected(),
   })
+}
+
+export const useTagsMutation = () => {
+  const queryClient = useQueryClient()
+  const updateTagsMutation = useMutation({
+    mutationFn: mockPatchTagsApiCall,
+    onError: () => {
+      // snackbar
+    },
+    onSuccess: async () => {
+      return queryClient.invalidateQueries({ queryKey: tagsQueryKeys.listSelected() })
+    },
+  })
+  return { updateTagsMutation }
 }

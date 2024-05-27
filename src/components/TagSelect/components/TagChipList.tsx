@@ -3,11 +3,11 @@ import type { Option } from "@components/TagSelect/TagSelect"
 import { Box, Chip, Typography } from "@mui/material"
 
 export const TagChipList = ({
-  selectedValues,
+  data,
   onDelete,
   isError,
 }: {
-  selectedValues: Option[]
+  data: Option[]
   onDelete: (value: Option) => void
   isError?: boolean
 }) =>
@@ -15,8 +15,8 @@ export const TagChipList = ({
     <TagErrorAlert />
   ) : (
     <Box data-testid="tag-select-chips-list" display="flex" flexWrap="wrap">
-      {selectedValues?.length ? (
-        selectedValues.map((element) => (
+      {data?.length ? (
+        data.map((element) => (
           <Box key={element.optionKey} p={0.5} width="fit-content">
             <Chip
               label={element.label}
